@@ -1,0 +1,192 @@
+<div class="container" style="margin-top: 80px" *ngIf="accountService.currentUser$ | async">
+  <div class="row">
+    <div class="col-sm-4" *ngIf="carroSelecionado">
+      <button class="btn btn-warning" (click)="voltar()">Fechar</button>
+
+      <form [formGroup]="carroForm" (submit)="carroSubmit()">
+        <div class="form-group">
+          <h1>Carro: {{carroSelecionado.id}}</h1>
+        <label>Modelo</label>
+        <input type="text" class="form-control col-md-8" formControlName="modelo" required>
+      </div>
+      <div class="form-group">
+        <label>Marca</label>
+        <input type="text" class="form-control col-md-8" formControlName="marca" required>
+      </div>
+      <div class="form-group">
+        <label>Placa</label>
+        <input mask="SSS-0A00" type="text" class="form-control col-md-8" formControlName="placa" required minlength="7">
+      </div>
+      <div class="form-group">
+        <label>Ano</label>
+        <input mask="0000" type="text" class="form-control col-md-8" formControlName="ano" required minlength="4">
+      </div>
+      <div class="form-group">
+        <label>Diária</label>
+        <input type="number" class="form-control col-md-8" formControlName="valorDiaria" required>
+      </div>
+      <div class="form-group">
+        <label>Cor</label>
+        <input type="text" class="form-control col-md-8" formControlName="cor" required>
+      </div>
+      <div class="form-group">
+        <label>Grupo</label>
+        <select class="form-control col-md-8" formControlName="grupoId" required>
+          <option *ngFor="let grupo of grupos" value="{{grupo.id}}">{{grupo.id}} - {{grupo.nomeGrupo}}</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="!carroForm.valid">Salvar</button>
+    </form>
+  </div>
+
+  <div [ngClass]="{'col-sm-12': !carroSelecionado, 'col-sm-6': carroSelecionado}">
+    <button class="btn btn-primary" *ngIf="!carroSelecionado" (click)="openModal(novoCarro)">Novo carro</button>
+    <h1>Carros</h1>
+    <input type="text" class="sm-4" placeholder="Buscar" [(ngModel)]="filtroLista" style="margin-bottom: 10px;">
+    <h3>Filtro: {{filtroLista}}</h3>
+    <table class="table table-hover table-dark">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Modelo</th>
+          <th scope="col">Marca</th>
+          <th scope="col">Placa</th>
+          <th scope="col">Ano</th>
+          <th scope="col">Diária</th>
+          <th scope="col">Cor</th>
+          <th scope="col">Grupo</th>
+          <th scope="col">Opções</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="carros && carros.length">
+        <tr *ngFor="let carro of carrosFiltrados">
+          <th scope="row">{{carro.id}}</th>
+          <td>{{carro.modelo}}</td>
+          <td>{{carro.marca}}</td>
+          <td>{{carro.placa}}</td>
+          <td>{{carro.ano}}</td>
+          <td>R${{carro.valorDiaria}}</td>
+          <td>{{carro.cor}}</td>
+          <td><div style="display: none;">{{carro.grupoId}}</div><div *ngFor="let grupo of grupos"><div *ngIf="carro.grupoId == grupo.id">{{grupo.nomeGrupo}}</div></div></td>
+          <td>
+            <div class="btn-group">
+              <button (click)="carroSelect(carro)" class="btn btn-sm btn-warning" style="margin-right: 10px;">Detalhes</button>
+              <button (click)="openModal(template); registrosSelect(carro)" class="btn btn-sm btn-primary" style="margin-right: 10px;">Registros</button>
+              <button (click)="openModal(deleteTemplate); carroSelectDelete(carro)" class="btn btn-sm btn-danger">Desativar</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<ng-template #novoCarro>
+<div class="container">
+  <form [formGroup]="novoCarroForm" (submit)="postCarro()" class="needs-validation" novalidate>
+    <div class="form-row">
+      <div class="col-md-6 mb-3">
+        <label>Modelo</label>
+        <input type="text" class="form-control" formControlName="modelo" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label>Marca</label>
+        <input type="text" class="form-control" formControlName="marca" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col-md-6 mb-3">
+        <label>Placa</label>
+        <input mask="SSS-0A00" type="text" class="form-control" formControlName="placa" required minlength="7">
+      </div>
+        <div class="col-md-6 mb-3">
+          <label>Ano</label>
+          <input mask="0000" type="text" class="form-control" formControlName="ano" required minlength="4">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col-md-4 mb-3">
+          <label>Valor da diária</label>
+          <input type="number" class="form-control" formControlName="valorDiaria" required>
+        </div>
+          <div class="col-md-4 mb-3">
+            <label>Cor</label>
+            <input type="text" class="form-control" formControlName="cor" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label>Grupo</label>
+            <select class="form-control" formControlName="grupoId">
+              <option *ngFor="let grupo of grupos" value="{{grupo.id}}">{{grupo.id}} - {{grupo.nomeGrupo}}</option>
+            </select>
+          </div>
+        </div>
+
+
+    <button class="btn btn-primary" type="submit" [disabled]="!novoCarroForm.valid" style="margin-bottom: 10px;">Criar</button>
+  </form>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn pull-right" aria-label="Close" (click)="modalRef?.hide()">
+  FECHAR
+</button>
+</div>
+</ng-template>
+
+
+
+
+
+
+
+<ng-template #template>
+  <div class="modal-header">
+    <h1>{{carroSelecionado2.modelo}}</h1>
+  </div>
+  <div class="modal-body">
+    <table class="table table-hover">
+      <tbody *ngIf="registros && registros.length">
+        <tr *ngFor="let registro of registros">
+          <div *ngIf="registro.carroId == carroSelecionado2.id">
+            <th scope="row">{{registro.id}}</th>
+            <td>
+              <div *ngFor="let cliente of clientes">
+                <div *ngIf="cliente.id == registro.clienteId">
+                  {{cliente.nomeCliente}}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="display: none;">{{registro.carroId}}</div>
+              <div *ngFor="let carro of carros">
+                <div *ngIf="carro.id == registro.carroId">{{carro.modelo}}</div>
+              </div>
+            </td>
+            <td>{{registro.dataInicio | date: 'dd-MM-yyyy'}}</td>
+            <td>{{registro.dataFim | date: 'dd-MM-yyyy'}}</td>
+            <td>R${{registro.valorAluguel}}</td>
+          </div>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+<div class="modal-footer">
+  <button type="button" class="btn pull-right" aria-label="Close" (click)="modalRef?.hide()">
+    FECHAR
+  </button>
+</div>
+</ng-template>
+
+<ng-template #deleteTemplate>
+  <div class="modal-header">
+    <h1>Tem certeza que deseja desativar o carro?</h1>
+  </div>
+  <div class="modal-body">
+    <h3>{{carroSelecionadoDelete.id}} - {{carroSelecionadoDelete.modelo}} - {{carroSelecionadoDelete.marca}}</h3>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="deleteCarro()">Desativar</button>
+    <button type="button" class="btn btn-primary" (click)="modalRef?.hide()">Cancelar</button>
+  </div>
+</ng-template>
+

@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+  <div class="container">
+    <img src="/assets/logoloccar.png" style="height: 25px; width: 80px; margin-top: 10px; margin-right: 20px; margin-bottom: 10px;">
+    <ul class="navbar-nav mr-auto" *ngIf="accountService.currentUser$ | async">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/clientes">Clientes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/registros-alugueis">Registros de aluguel</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/carros">Carros</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/funcionarios">Funcionários</a>
+        </li>
+      </ul>
+
+      <div class="dropdown" *ngIf="accountService.currentUser$ | async" dropdown>
+        <a class="dropdown-toggle text-light" dropdownToggle>Bem Vindo</a>
+        <div class="dropdown-menu mt-3" *dropdownMenu>
+          <a class="dropdown-item">{{usuarioAtual.nomeFuncionario}}</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item">Editar perfil</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" (click)="logout()">Logout</a>
+        </div>
+      </div>
+
+      <form *ngIf="(accountService.currentUser$ | async) === null" #loginForm="ngForm" class="form-inline mt-2 mt-md-0" (ngSubmit)="login()" autocomplete="off">
+        <input
+          name="username"
+          [(ngModel)]="model.username"
+          class="form-control mr-sm-2"
+          type="text"
+          placeholder="Username">
+        <input
+          name="senha"
+          [(ngModel)]="model.senha"
+          class="form-control mr-sm-2"
+          type="password"
+          placeholder="Password">
+        <button routerLink="registros-alugueis" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Login</button>
+      </form>
+
+  </div>
+</nav>
+
+<div *ngIf="(accountService.currentUser$ | async) === null">
+  <app-home></app-home>
+</div>
